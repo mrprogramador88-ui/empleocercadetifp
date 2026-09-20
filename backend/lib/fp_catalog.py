@@ -1,0 +1,262 @@
+"""Catálogo de la Formación Profesional española (títulos regulados).
+
+Datos públicos del Catálogo de Títulos de FP (Ministerio de Educación / BOE):
+familias profesionales, títulos de Grado Medio y Grado Superior, y las áreas
+profesionales asociadas a cada título. Es la columna vertebral del motor de
+coincidencia: a partir del título del usuario se derivan las áreas profesionales
+(puestos, técnicas y sectores) con las que se compara cada empresa y oferta.
+"""
+
+FAMILIAS: list[dict] = [
+    {"id": "adi", "nombre": "Administración y Gestión"},
+    {"id": "com", "nombre": "Comercio y Marketing"},
+    {"id": "elec", "nombre": "Electricidad y Electrónica"},
+    {"id": "ifc", "nombre": "Informática y Comunicaciones"},
+    {"id": "mec", "nombre": "Fabricación Mecánica"},
+    {"id": "ins", "nombre": "Instalación y Mantenimiento"},
+    {"id": "veh", "nombre": "Transporte y Mantenimiento de Vehículos"},
+    {"id": "san", "nombre": "Sanidad"},
+    {"id": "hos", "nombre": "Hostelería y Turismo"},
+    {"id": "edc", "nombre": "Edificación y Obra Civil"},
+    {"id": "ene", "nombre": "Energía y Agua"},
+    {"id": "imp", "nombre": "Imagen Personal"},
+    {"id": "soc", "nombre": "Servicios Socioculturales y a la Comunidad"},
+    {"id": "ind", "nombre": "Industrias Alimentarias"},
+    {"id": "qui", "nombre": "Química"},
+    {"id": "agr", "nombre": "Agraria"},
+    {"id": "mad", "nombre": "Madera, Mueble y Corcho"},
+    {"id": "vid", "nombre": "Vidrio y Cerámica"},
+    {"id": "tex", "nombre": "Textil, Confección y Piel"},
+    {"id": "cis", "nombre": "Comunicación, Imagen y Sonido"},
+]
+
+FAMILIA_RELATIONS: dict[str, list[str]] = {
+    "adi": ["com", "ifc"],
+    "com": ["adi", "hos", "veh"],
+    "elec": ["ene", "ins", "edc", "mec"],
+    "ifc": ["elec", "cis", "com"],
+    "mec": ["ins", "veh", "edc", "mad"],
+    "ins": ["elec", "mec", "veh", "ene"],
+    "veh": ["mec", "ins", "com"],
+    "san": ["qui", "soc", "imp"],
+    "hos": ["com", "imp", "ind"],
+    "edc": ["elec", "ins", "mad", "ene"],
+    "ene": ["elec", "ins", "qui", "edc"],
+    "imp": ["hos", "san", "soc"],
+    "soc": ["san", "hos"],
+    "ind": ["qui", "agr", "hos"],
+    "qui": ["san", "ind", "ene"],
+    "agr": ["ind", "mad"],
+    "mad": ["mec", "edc", "agr"],
+    "vid": ["mad", "edc"],
+    "tex": ["ind"],
+    "cis": ["ifc", "com"],
+}
+
+# Títulos regulados más habituales, con sus áreas profesionales. Si una familia
+# no tiene títulos aquí, el asistente permite escribirlo manualmente.
+TITULOS: list[dict] = [
+    # Administración y Gestión
+    {"id": "gm-gestion-administrativa", "nombre": "Gestión Administrativa", "grado": "GM", "familia": "adi",
+     "areas": ["gestión administrativa", "facturación", "contabilidad", "nóminas", "ofimática", "archivo", "gestión documental", "atención al cliente"],
+     "skills": ["ofimática", "excel", "facturación", "contabilidad básica", "atención al cliente", "gestión documental"]},
+    {"id": "gs-administracion-finanzas", "nombre": "Administración y Finanzas", "grado": "GS", "familia": "adi",
+     "areas": ["contabilidad", "tesorería", "fiscal", "auditoría", "gestión financiera", "asesoría", "nóminas"],
+     "skills": ["contabilidad", "sage", "fiscalidad", "nóminas", "excel avanzado", "gestión de tesorería"]},
+    {"id": "gs-asistencia-direccion", "nombre": "Asistencia a la Dirección", "grado": "GS", "familia": "adi",
+     "areas": ["secretariado", "agenda", "actas", "documentación", "comunicación corporativa"],
+     "skills": ["secretariado", "ofimática avanzada", "organización de agendas", "redacción corporativa", "inglés"]},
+    # Comercio y Marketing
+    {"id": "gm-comercio", "nombre": "Comercio", "grado": "GM", "familia": "com",
+     "areas": ["venta", "retail", "caja", "escaparatismo", "atención al cliente", "reposición", "almacén"],
+     "skills": ["venta", "atención al cliente", "manejo de caja", "merchandising", "gestión de stock"]},
+    {"id": "gm-actividades-comerciales", "nombre": "Actividades Comerciales", "grado": "GM", "familia": "com",
+     "areas": ["ventas", "organización de eventos", "marketing", "compras"],
+     "skills": ["ventas", "marketing básico", "organización de eventos", "negociación"]},
+    {"id": "gs-marketing-publicidad", "nombre": "Marketing y Publicidad", "grado": "GS", "familia": "com",
+     "areas": ["marketing digital", "redes sociales", "seo", "publicidad", "copywriting", "plan de medios"],
+     "skills": ["marketing digital", "redes sociales", "seo", "google ads", "redacción publicitaria", "canva"]},
+    {"id": "gs-comercio-internacional", "nombre": "Comercio Internacional", "grado": "GS", "familia": "com",
+     "areas": ["importación", "exportación", "aduanas", "logística internacional", "incoterms"],
+     "skills": ["comercio exterior", "incoterms", "inglés", "documentación de aduanas", "logística internacional"]},
+    {"id": "gs-transporte-logistica", "nombre": "Transporte y Logística", "grado": "GS", "familia": "com",
+     "areas": ["logística", "almacén", "flota", "cadena de suministro", "transporte de mercancías", "paquetería"],
+     "skills": ["gestión de almacén", "wms", "planificación de rutas", "cadena de suministro", "carnet B"]},
+    # Electricidad y Electrónica
+    {"id": "gm-instalaciones-electricas", "nombre": "Instalaciones Eléctricas y Automáticas", "grado": "GM", "familia": "elec",
+     "areas": ["instalaciones eléctricas", "cuadros eléctricos", "baja tensión", "domótica", "automatismos", "mantenimiento eléctrico", "alumbrado"],
+     "skills": ["instalaciones eléctricas", "cuadros eléctricos", "lectura de esquemas", "domótica", "automatismos cableados"]},
+    {"id": "gm-instalaciones-telecomunicaciones", "nombre": "Instalaciones de Telecomunicaciones", "grado": "GM", "familia": "elec",
+     "areas": ["fibra óptica", "redes de voz y datos", "antenas", "cctv", "videovigilancia", "infraestructura de telecomunicaciones"],
+     "skills": ["fibra óptica", "empalmes", "redes de datos", "cctv", "antenas colectivas"]},
+    {"id": "gs-sistemas-electrotecnicos", "nombre": "Sistemas Electrotécnicos y Automatizados", "grado": "GS", "familia": "elec",
+     "areas": ["instalaciones eléctricas", "mantenimiento eléctrico", "automatización industrial", "plc", "cuadros eléctricos", "baja y alta tensión", "energías renovables", "instalaciones fotovoltaicas", "mantenimiento industrial", "ingeniería eléctrica", "telecomunicaciones de instalaciones eléctricas"],
+     "skills": ["automatización industrial", "plc", "cuadros eléctricos", "baja y alta tensión", "instalaciones fotovoltaicas", "mantenimiento industrial", "esquemas eléctricos"]},
+    {"id": "gs-automatizacion-robotica", "nombre": "Automatización y Robótica Industrial", "grado": "GS", "familia": "elec",
+     "areas": ["plc", "robots industriales", "neumática", "hidráulica", "instrumentación", "celtas automatizadas", "industria 4.0"],
+     "skills": ["plc", "neumática", "hidráulica", "robótica industrial", "instrumentación", "hmi"]},
+    # Informática y Comunicaciones
+    {"id": "gm-sistemas-microinformaticos", "nombre": "Sistemas Microinformáticos y Redes", "grado": "GM", "familia": "ifc",
+     "areas": ["soporte técnico", "redes", "hardware", "montaje de equipos", "ofimática", "sistemas operativos"],
+     "skills": ["soporte técnico", "montaje de equipos", "windows", "redes lan", "ofimática", "atención a usuarios"]},
+    {"id": "gs-asir", "nombre": "Administración de Sistemas Informáticos en Red", "grado": "GS", "familia": "ifc",
+     "areas": ["administración de sistemas", "linux", "windows server", "virtualización", "bases de datos", "seguridad informática", "cloud"],
+     "skills": ["linux", "windows server", "virtualización", "sql", "seguridad informática", "cloud"]},
+    {"id": "gs-dam", "nombre": "Desarrollo de Aplicaciones Multiplataforma", "grado": "GS", "familia": "ifc",
+     "areas": ["programación", "java", "sql", "aplicaciones móviles", "uml", "acceso a datos"],
+     "skills": ["java", "sql", "programación orientada a objetos", "python", "uml"]},
+    {"id": "gs-daw", "nombre": "Desarrollo de Aplicaciones Web", "grado": "GS", "familia": "ifc",
+     "areas": ["desarrollo web", "html", "css", "javascript", "php", "frameworks", "bases de datos"],
+     "skills": ["html", "css", "javascript", "php", "mysql", "desarrollo web"]},
+    {"id": "gs-sistemas-telecomunicaciones", "nombre": "Sistemas de Telecomunicaciones e Informáticos", "grado": "GS", "familia": "ifc",
+     "areas": ["telecomunicaciones", "redes de datos", "servidores", "radioenlaces", "transmisión de datos"],
+     "skills": ["redes de telecomunicación", "configuración de routers", "servidores", "fibra óptica", "cisco"]},
+    # Fabricación Mecánica
+    {"id": "gm-mecanizado", "nombre": "Mecanizado", "grado": "GM", "familia": "mec",
+     "areas": ["torno", "fresadora", "cnc", "interpretación de planos", "control de calidad", "mecanización"],
+     "skills": ["torno", "fresadora", "cnc", "interpretación de planos", "metrología"]},
+    {"id": "gm-soldadura-caldereria", "nombre": "Soldadura y Calderería", "grado": "GM", "familia": "mec",
+     "areas": ["soldadura mig", "soldadura tig", "calderería", "estructuras metálicas", "planos de calderería"],
+     "skills": ["soldadura tig", "soldadura mig", "calderería", "estructuras metálicas", "oxycorte"]},
+    {"id": "gm-construcciones-metalicas", "nombre": "Construcciones Metálicas", "grado": "GM", "familia": "mec",
+     "areas": ["estructuras metálicas", "montaje", "cerrajería", "perfilería"],
+     "skills": ["montaje de estructuras", "cerrajería", "soldadura", "lectura de planos"]},
+    {"id": "gs-diseno-fabricacion-mecanica", "nombre": "Diseño en Fabricación Mecánica", "grado": "GS", "familia": "mec",
+     "areas": ["diseño mecánico", "cad", "solidworks", "autocad", "planos técnicos", "definición de piezas"],
+     "skills": ["autocad", "solidworks", "catia", "diseño mecánico", "planos técnicos"]},
+    {"id": "gs-programacion-produccion", "nombre": "Programación de la Producción en Fabricación Mecánica", "grado": "GS", "familia": "mec",
+     "areas": ["planificación de la producción", "cnc", "lean manufacturing", "mejora continua", "calidad"],
+     "skills": ["planificación de la producción", "programación cnc", "lean manufacturing", "gestión de calidad"]},
+    # Instalación y Mantenimiento
+    {"id": "gm-mantenimiento-electromecanico", "nombre": "Mantenimiento Electromecánico", "grado": "GM", "familia": "ins",
+     "areas": ["mantenimiento industrial", "motores", "bombas", "neumática", "lubricación", "electricidad"],
+     "skills": ["mantenimiento preventivo", "neumática", "motores eléctricos", "bombas", "lubricación industrial"]},
+    {"id": "gs-mecatronica-industrial", "nombre": "Mecatrónica Industrial", "grado": "GS", "familia": "ins",
+     "areas": ["mecatrónica", "automatismos", "robótica", "mantenimiento industrial", "instrumentación"],
+     "skills": ["mecatrónica", "automatismos", "plc", "robótica", "instrumentación industrial"]},
+    {"id": "gs-mantenimiento-electronico", "nombre": "Mantenimiento Electrónico Industrial", "grado": "GS", "familia": "ins",
+     "areas": ["electrónica industrial", "mantenimiento electrónico", "variadores", "control de procesos"],
+     "skills": ["electrónica industrial", "variadores de frecuencia", "control de procesos", "diagnosis electrónica"]},
+    # Transporte y Mantenimiento de Vehículos
+    {"id": "gm-electromecanica-vehiculos", "nombre": "Electromecánica de Vehículos Automóviles", "grado": "GM", "familia": "veh",
+     "areas": ["mecánica del automóvil", "diagnosis", "frenos", "motor", "electricidad del automóvil", "mantenimiento de vehículos"],
+     "skills": ["mecánica del automóvil", "diagnosis electrónica", "sistemas de frenos", "electricidad del automóvil"]},
+    {"id": "gm-carroceria", "nombre": "Carrocería", "grado": "GM", "familia": "veh",
+     "areas": ["chapa", "pintura", "carrocería", "restauración de vehículos"],
+     "skills": ["chapa", "pintura de vehículos", "estucado", "pulido"]},
+    # Sanidad
+    {"id": "gm-cuidados-auxiliares-enfermeria", "nombre": "Cuidados Auxiliares de Enfermería", "grado": "GM", "familia": "san",
+     "areas": ["auxiliar de enfermería", "hospital", "residencia", "higiene", "cuidados básicos", "toma de constantes"],
+     "skills": ["cuidados básicos", "toma de constantes", "movilizaciones de pacientes", "higiene hospitalaria"]},
+    {"id": "gm-farmacia-parafarmacia", "nombre": "Farmacia y Parafarmacia", "grado": "GM", "familia": "san",
+     "areas": ["farmacia", "dispensación", "dermofarmacia", "atención al paciente", "venta de productos de parafarmacia"],
+     "skills": ["dispensación", "dermofarmacia", "atención al paciente", "gestión de inventario"]},
+    {"id": "gm-emergencias-sanitarias", "nombre": "Emergencias Sanitarias", "grado": "GM", "familia": "san",
+     "areas": ["emergencias", "ambulancia", "soporte vital", "primeros auxilios", "traslado sanitario"],
+     "skills": ["soporte vital básico", "primeros auxilios", "traslado sanitario", "gestión del estrés"]},
+    {"id": "gs-documentacion-sanitaria", "nombre": "Documentación y Administración Sanitarias", "grado": "GS", "familia": "san",
+     "areas": ["admisión de pacientes", "codificación cie", "gestión documental sanitaria", "archivo clínico"],
+     "skills": ["codificación cie", "gestión documental sanitaria", "ofimática", "agenda médica"]},
+    {"id": "gs-imagen-diagnostico", "nombre": "Imagen para el Diagnóstico", "grado": "GS", "familia": "san",
+     "areas": ["radiología", "rayos x", "ecografía", "radiodiagnóstico", "protección radiológica"],
+     "skills": ["radiología digital", "protección radiológica", "pac", "atención al paciente"]},
+    {"id": "gs-anatomia-patologica", "nombre": "Anatomía Patológica y Citología", "grado": "GS", "familia": "san",
+     "areas": ["citología", "necropsias", "laboratorio de anatomía patológica", "inmunotécnicas"],
+     "skills": ["técnicas citológicas", "procesado de muestras", "tinciones", "laboratorio"]},
+    {"id": "gs-dietetica", "nombre": "Dietética", "grado": "GS", "familia": "san",
+     "areas": ["dietética", "nutrición", "menús", "higiene de los alimentos", "control de dietas"],
+     "skills": ["elaboración de dietas", "nutrición", "alérgenos", "educación alimentaria"]},
+    # Hostelería y Turismo
+    {"id": "gm-cocina-gastronomia", "nombre": "Cocina y Gastronomía", "grado": "GM", "familia": "hos",
+     "areas": ["cocina", "elaboración de alimentos", "mise en place", "seguridad alimentaria", "alérgenos"],
+     "skills": ["elaboración de alimentos", "appcc", "alérgenos", "trabajo en cocina", "mise en place"]},
+    {"id": "gm-servicios-restauracion", "nombre": "Servicios en Restauración", "grado": "GM", "familia": "hos",
+     "areas": ["bar", "restaurante", "sala", "vinos", "atención al cliente"],
+     "skills": ["servicio en sala", "coctelería", "manejo de tpv", "atención al cliente"]},
+    {"id": "gs-direccion-cocina", "nombre": "Dirección de Cocina", "grado": "GS", "familia": "hos",
+     "areas": ["gestión de cocina", "escandallos", "compras", "diseño de cartas", "seguridad alimentaria"],
+     "skills": ["gestión de cocina", "escandallos", "gestión de compras", "appcc"]},
+    {"id": "gs-agencias-viajes", "nombre": "Agencias de Viajes y Gestión de Eventos", "grado": "GS", "familia": "hos",
+     "areas": ["agencia de viajes", "reservas", "eventos", "turismo", "destinos"],
+     "skills": ["gestión de reservas", "amadeus", "diseño de viajes", "inglés", "atención al cliente"]},
+    # Edificación y Obra Civil
+    {"id": "gs-proyectos-edificacion", "nombre": "Proyectos de Edificación", "grado": "GS", "familia": "edc",
+     "areas": ["proyectos de edificación", "mediciones", "planos", "cype", "presupuestos"],
+     "skills": ["autocad", "cype", "mediciones y presupuestos", "planos de edificio"]},
+    {"id": "gs-organizacion-control-obras", "nombre": "Organización y Control de Obras", "grado": "GS", "familia": "edc",
+     "areas": ["jefe de obra", "control de calidad", "ejecución de obra", "seguridad en obra", "medición"],
+     "skills": ["planificación de obra", "control de calidad", "seguridad y salud", "ofimática"]},
+    # Energía y Agua
+    {"id": "gs-energias-renovables", "nombre": "Energías Renovables", "grado": "GS", "familia": "ene",
+     "areas": ["solar fotovoltaica", "eólica", "biomasa", "eficiencia energética", "aerotermia", "instalaciones fotovoltaicas"],
+     "skills": ["solar fotovoltaica", "eficiencia energética", "eólica", "aerotermia", "mantenimiento de instalaciones"]},
+    {"id": "gs-eficiencia-energetica", "nombre": "Eficiencia Energética y Solar Térmica", "grado": "GS", "familia": "ene",
+     "areas": ["solar térmica", "climatización", "auditorías energéticas", "certificación energética"],
+     "skills": ["solar térmica", "auditorías energéticas", "climatización", "certificación energética"]},
+    # Imagen Personal
+    {"id": "gm-estetica", "nombre": "Estética", "grado": "GM", "familia": "imp",
+     "areas": ["estética", "manicura", "depilación", "tratamientos faciales", "maquillaje"],
+     "skills": ["tratamientos faciales", "manicura", "depilación", "maquillaje social"]},
+    {"id": "gm-peluqueria", "nombre": "Peluquería y Cosmética Capilar", "grado": "GM", "familia": "imp",
+     "areas": ["corte", "coloración", "peinados", "tratamientos capilares"],
+     "skills": ["corte de pelo", "coloración", "peinados", "tratamientos capilares"]},
+    {"id": "gs-asesoria-imagen", "nombre": "Asesoría de Imagen Personal", "grado": "GS", "familia": "imp",
+     "areas": ["asesoría de imagen", "estilismo", "visagismo", "comunicación de imagen"],
+     "skills": ["asesoría de imagen", "estilismo", "atención al cliente", "marketing personal"]},
+    {"id": "gs-estilismo-direccion-peluqueria", "nombre": "Estilismo y Dirección de Peluquería", "grado": "GS", "familia": "imp",
+     "areas": ["estilismo", "dirección de peluquería", "gestión del salón", "tendencias capilares"],
+     "skills": ["estilismo", "gestión de salón", "color avanzado", "atención al cliente"]},
+    # Servicios Socioculturales y a la Comunidad
+    {"id": "gm-atencion-dependencia", "nombre": "Atención a Personas en Situación de Dependencia", "grado": "GM", "familia": "soc",
+     "areas": ["dependencia", "residencia", "cuidados", "autonomía personal", "atención domiciliaria"],
+     "skills": ["atención a dependientes", "autonomía personal", "psicomotricidad", "técnicas de cuidados"]},
+    {"id": "gs-educacion-infantil", "nombre": "Educación Infantil", "grado": "GS", "familia": "soc",
+     "areas": ["educación infantil", "jardín de infancia", "ludoteca", "0 a 6 años", "talleres infantiles"],
+     "skills": ["talleres infantiles", "primeros auxilios", "atención al niño", "programación didáctica"]},
+    {"id": "gs-integracion-social", "nombre": "Integración Social", "grado": "GS", "familia": "soc",
+     "areas": ["integración social", "colectivos en riesgo", "mediación", "inserción"],
+     "skills": ["intervención social", "mediación", "trabajo con colectivos", "informes sociales"]},
+    {"id": "gs-animacion-sociodeportiva", "nombre": "Animación Sociodeportiva", "grado": "GS", "familia": "soc",
+     "areas": ["animación sociodeportiva", "monitor deportivo", "condición física", "actividades de tiempo libre"],
+     "skills": ["dirigir actividades físicas", "monitoreo deportivo", "primeros auxilios", "planificación de actividades"]},
+    # Industrias Alimentarias
+    {"id": "gm-industrias-alimentarias", "nombre": "Industrias Alimentarias", "grado": "GM", "familia": "ind",
+     "areas": ["elaboración de alimentos", "envasado", "haccp", "seguridad alimentaria", "control de calidad básico"],
+     "skills": ["appcc", "envasado", "higiene alimentaria", "manipulación de alimentos"]},
+    {"id": "gs-procesos-calidad-alimentaria", "nombre": "Procesos y Calidad en la Industria Alimentaria", "grado": "GS", "familia": "ind",
+     "areas": ["calidad alimentaria", "i+d alimentario", "normativa alimentaria", "auditorías"],
+     "skills": ["brc", "ifs food", "auditorías internas", "normativa alimentaria", "appcc"]},
+    # Química
+    {"id": "gm-operaciones-laboratorio", "nombre": "Operaciones de Laboratorio", "grado": "GM", "familia": "qui",
+     "areas": ["laboratorio químico", "análisis básicos", "instrumentación", "preparación de muestras"],
+     "skills": ["preparación de muestras", "laboratorio químico", "normas de seguridad", "instrumental básico"]},
+    {"id": "gs-quimica-salud-ambiental", "nombre": "Química y Salud Ambiental", "grado": "GS", "familia": "qui",
+     "areas": ["análisis ambientales", "salud ambiental", "laboratorio", "control de contaminación"],
+     "skills": ["análisis ambientales", "cromatografía", "salud ambiental", "muestreo"]},
+    # Agraria
+    {"id": "gm-jardineria-floristeria", "nombre": "Jardinería y Floristería", "grado": "GM", "familia": "agr",
+     "areas": ["jardinería", "floristería", "sistemas de riego", "céspedes", "fitosanitarios básicos"],
+     "skills": ["jardinería", "instalación de riego", "floristería", "fitorreguladores"]},
+    {"id": "gs-gestion-forestal", "nombre": "Gestión Forestal y del Medio Natural", "grado": "GS", "familia": "agr",
+     "areas": ["gestión forestal", "medio natural", "conservación", "repoblaciones"],
+     "skills": ["inventariado forestal", "conservación del hábitat", "extinción de incendios básica"]},
+    # Textil, Confección y Piel
+    {"id": "gm-confeccion-moda", "nombre": "Confección y Moda", "grado": "GM", "familia": "tex",
+     "areas": ["confección", "patronaje básico", "moda", "acabados textiles"],
+     "skills": ["confección", "máquinas de coser industriales", "acabados", "patronaje básico"]},
+]
+
+FAMILIAS_BY_ID: dict[str, dict] = {f["id"]: f for f in FAMILIAS}
+TITULOS_BY_ID: dict[str, dict] = {t["id"]: t for t in TITULOS}
+
+
+def normalize(s: str) -> str:
+    return (
+        s.lower()
+        .replace("á", "a").replace("é", "e").replace("í", "i")
+        .replace("ó", "o").replace("ú", "u").replace("ü", "u").replace("ñ", "n")
+    )
+
+
+def titulo_by_id(titulo_id: str | None) -> dict | None:
+    return TITULOS_BY_ID.get(titulo_id) if titulo_id else None

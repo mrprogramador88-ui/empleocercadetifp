@@ -1,0 +1,213 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/dm-sans";
+@import "@fontsource-variable/outfit";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: 'Outfit Variable', 'DM Sans Variable', sans-serif;
+    --font-sans: 'DM Sans Variable', ui-sans-serif, sans-serif;
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Tema claro: pizarra cálida + cobalto ibérico (guía de diseño del proyecto). */
+:root {
+    --background: #F8FAFC;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+    --primary: #2563EB;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F1F5F9;
+    --secondary-foreground: #0F172A;
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    --accent: #EFF6FF;
+    --accent-foreground: #1E40AF;
+    --destructive: #DC2626;
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #2563EB;
+    --chart-1: #2563EB;
+    --chart-2: #0D9488;
+    --chart-3: #F59E0B;
+    --chart-4: #4F46E5;
+    --chart-5: #64748B;
+    --radius: 0.625rem;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #0F172A;
+    --sidebar-primary: #2563EB;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #EFF6FF;
+    --sidebar-accent-foreground: #1E40AF;
+    --sidebar-border: #E2E8F0;
+    --sidebar-ring: #2563EB;
+}
+
+.dark {
+    --background: #0B1220;
+    --foreground: #F8FAFC;
+    --card: #101A2E;
+    --card-foreground: #F8FAFC;
+    --popover: #101A2E;
+    --popover-foreground: #F8FAFC;
+    --primary: #3B82F6;
+    --primary-foreground: #FFFFFF;
+    --secondary: #1E293B;
+    --secondary-foreground: #F8FAFC;
+    --muted: #1E293B;
+    --muted-foreground: #94A3B8;
+    --accent: #16233D;
+    --accent-foreground: #BFDBFE;
+    --destructive: #EF4444;
+    --border: #1E293B;
+    --input: #1E293B;
+    --ring: #3B82F6;
+    --chart-1: #3B82F6;
+    --chart-2: #14B8A6;
+    --chart-3: #F59E0B;
+    --chart-4: #6366F1;
+    --chart-5: #94A3B8;
+    --sidebar: #101A2E;
+    --sidebar-foreground: #F8FAFC;
+    --sidebar-primary: #3B82F6;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #16233D;
+    --sidebar-accent-foreground: #BFDBFE;
+    --sidebar-border: #1E293B;
+    --sidebar-ring: #3B82F6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+  h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+  }
+}
+
+/* ------------------------------------------------------------------ mapa -- */
+/* Leaflet asigna z-index internos de hasta 800 a sus paneles y controles, que
+   se pintarían por encima del asistente (z-50) y de los diálogos. Se aíslan en
+   su propio contexto de apilamiento y se bajan a valores locales. */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #E8EEF5;
+  isolation: isolate;
+  z-index: 0;
+}
+
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control {
+  z-index: 1;
+}
+
+/* Chincheta del usuario (azul con anillo) */
+.user-pin {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+.user-pin-dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: #2563EB;
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.45);
+}
+
+/* Chincheta de empresa: color por nivel de afinidad + pulso si hay oferta activa */
+.company-pin {
+  position: relative;
+  width: 18px;
+  height: 18px;
+}
+.company-pin .pin-dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--pin, #64748B);
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.35);
+  transition: transform 150ms ease-out;
+}
+.company-pin:hover .pin-dot {
+  transform: scale(1.25);
+}
+.company-pin .pin-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--pin, #16A34A);
+  animation: ecdt-pulse 1.8s ease-out infinite;
+}
+
+@keyframes ecdt-pulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* Sliders de la interfaz */
+input[type="range"] {
+  height: 1.25rem;
+}

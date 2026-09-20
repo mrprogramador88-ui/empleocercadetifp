@@ -1,0 +1,230 @@
+{
+  "theme": "light_with_dark_ready",
+  "archetype": "ARCHETYPE 4: SWISS & HIGH-CONTRAST with warm European slate & vibrant Iberian electric cobalt",
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#F8FAFC",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569",
+        "roles": {
+          "link": "#0284C7",
+          "error": "#DC2626",
+          "success": "#16A34A",
+          "warning": "#D97706"
+        }
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#FFFFFF",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#64748B",
+        "roles": {
+          "link": "#0284C7",
+          "error": "#DC2626",
+          "success": "#16A34A",
+          "border": "#E2E8F0"
+        }
+      },
+      {
+        "name": "sidebar_active_item",
+        "kind": "solid",
+        "bg": "#EFF6FF",
+        "on_bg": "#1E40AF",
+        "on_bg_muted": "#3B82F6"
+      },
+      {
+        "name": "badge_match_high",
+        "kind": "solid",
+        "bg": "#DCFCE7",
+        "on_bg": "#166534",
+        "on_bg_muted": "#15803D"
+      },
+      {
+        "name": "badge_match_medium",
+        "kind": "solid",
+        "bg": "#FEF3C7",
+        "on_bg": "#92400E",
+        "on_bg_muted": "#B45309"
+      },
+      {
+        "name": "badge_fp_degree",
+        "kind": "solid",
+        "bg": "#E0E7FF",
+        "on_bg": "#3730A3",
+        "on_bg_muted": "#4338CA"
+      },
+      {
+        "name": "header_crystal",
+        "kind": "glass",
+        "contrast_against": "#FFFFFF",
+        "guarantee": "backdrop-blur-xl bg-white/85 border-b border-slate-200/80 shadow-xs",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569"
+      },
+      {
+        "name": "map_hud_overlay",
+        "kind": "glass",
+        "contrast_against": "#FFFFFF",
+        "guarantee": "backdrop-blur-md bg-white/90 border border-slate-200/90 shadow-md rounded-xl",
+        "on_bg": "#0F172A",
+        "on_bg_muted": "#475569"
+      },
+      {
+        "name": "inverse",
+        "kind": "solid",
+        "bg": "#0F172A",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#94A3B8"
+      }
+    ],
+    "accent": "#2563EB",
+    "on_accent": "#FFFFFF",
+    "brand": {
+      "primary": "#2563EB",
+      "primary_hover": "#1D4ED8",
+      "secondary": "#0D9488",
+      "warning": "#F59E0B",
+      "success": "#10B981",
+      "fp_gs_color": "#4F46E5",
+      "fp_gm_color": "#0284C7"
+    }
+  },
+  "typography": {
+    "font_family_heading": "Outfit, sans-serif",
+    "font_family_body": "DM Sans, sans-serif",
+    "font_family_mono": "JetBrains Mono, monospace",
+    "scale_px": {
+      "display": 52,
+      "h1": 40,
+      "h2": 30,
+      "h3": 22,
+      "h4": 18,
+      "body": 16,
+      "caption": 14
+    },
+    "letter_spacing": {
+      "heading": "-0.025em",
+      "overline": "0.15em",
+      "body": "0em"
+    }
+  },
+  "entry_surfaces": {
+    "/": "split-screen workstation — sticky header with profile status + left filter-and-results panel (380px-460px) + right full-height interactive Leaflet map canvas with HUD overlays, collapsible on mobile to stacked view with floating map/list toggle button"
+  },
+  "layout_architecture": {
+    "type": "split_screen_dashboard",
+    "desktop": {
+      "header_height": "64px",
+      "left_panel_width": "460px",
+      "left_panel_style": "h-[calc(100vh-64px)] overflow-y-auto border-r border-slate-200 bg-white flex flex-col",
+      "right_map_style": "h-[calc(100vh-64px)] flex-1 relative bg-slate-100 overflow-hidden"
+    },
+    "mobile": {
+      "behavior": "tabbed_view_switcher",
+      "modes": ["list", "map"],
+      "floating_toggle": "fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-blue-600 text-white shadow-xl rounded-full px-5 py-2.5 flex items-center gap-2 font-medium"
+    }
+  },
+  "core_user_flows": {
+    "wizard_flow": {
+      "title": "¿Qué has estudiado + Dónde estás?",
+      "purpose": "Asistente guiado de 3 pasos para recién titulados de FP sin fricciones técnicas",
+      "steps": [
+        {
+          "step": 1,
+          "name": "Estudios y FP",
+          "fields": ["Tipo de Grado (Grado Superior / Grado Medio / FP Básica / Curso de Especialización)", "Familia Profesional (ej. Informática y Comunicaciones, Sanidad, Electricidad y Electrónica, etc.)", "Ciclo Formativo específico", "Año de titulación / Estudiante en curso", "Habilidades técnicas y blandas", "Carnets (B, BTP, C, etc.) y Certificaciones"]
+        },
+        {
+          "step": 2,
+          "name": "Ubicación y Radio",
+          "fields": ["País (España / Europa)", "Comunidad Autónoma / Región", "Provincia", "Ciudad y Código Postal", "Ubicación interactiva (GPS / Click en mapa)", "Radio de búsqueda máximo en km (ej. 10km, 25km, 50km, 100km, Europa)"]
+        },
+        {
+          "step": 3,
+          "name": "Preferencias, CV y Disponibilidad",
+          "fields": ["Tipo de candidatura (Primer empleo, Prácticas FCT / DUAL, Jornada completa, Media jornada)", "Subida de CV en PDF (analizador visual y extracción de datos)", "Disponibilidad de incorporación"]
+        }
+      ]
+    },
+    "matching_engine": {
+      "algorithm": "Motor de afinidad ponderado para FP: Título/Ciclo (35%) + Familia Profesional y Especialidad (25%) + Habilidades y Requisitos (20%) + Proximidad geográfica al radio (15%) + Carnets/Idiomas (5%)",
+      "presentation": "Badge con color dinámico: 85-100% Verde Intenso (Alta afinidad FP), 65-84% Amarillo Ámbar (Buena afinidad), <65% Gris Azulado (Afinidad general)"
+    },
+    "ai_message_generator": {
+      "name": "Generador de Cartas de Presentación y Mensajes IA para FP",
+      "modes": [
+        {"id": "spontaneous", "label": "Candidatura Espontánea / Autocandidatura"},
+        {"id": "offer_reply", "label": "Respuesta a Oferta Activa"},
+        {"id": "fct_internship", "label": "Solicitud de Prácticas FCT / FP Dual"},
+        {"id": "recent_grad", "label": "Recién Titulado sin experiencia previa"},
+        {"id": "cv_attachment", "label": "Envío Formal de CV"}
+      ],
+      "features": ["Edición en tiempo real", "Copia al portapapeles con 1 click", "Apertura directa de cliente de correo (mailto: con asunto y cuerpo preformateado)", "Personalización automática con nombre de empresa, sector y ciclo cursado"]
+    }
+  },
+  "visual_enhancers": {
+    "map_tiles": "OpenStreetMap / CartoDB Positron tiles for crisp high-contrast professional rendering",
+    "marker_system": {
+      "active_offer": "Pin azul con pulso radar animado para ofertas activas",
+      "spontaneous_company": "Pin pizarra/esmeralda para empresas del sector con perfil receptor",
+      "user_location": "Pin con avatar de usuario y círculo de radio sombreado en azul transparente (fillOpacity: 0.12)"
+    },
+    "card_micro_interactions": "Elevación sutil en hover (translate-y-0.5), borde activo en azul 600 al seleccionar, sincronización bidireccional inmediata con el marcador del mapa (flyTo suave)"
+  },
+  "motion": {
+    "transitions": "transition-colors duration-150 ease-out, transition-transform duration-200 ease-out",
+    "map_fly_to": "Leaflet flyTo animation duration: 1.2s easeInOut",
+    "list_stagger": "motion.div variants with 0.04s stagger for job cards load"
+  },
+  "accessibility": {
+    "wcag_compliance": "WCAG 2.1 AA",
+    "apca_contrast": "All text and interactive icons have > 4.5:1 contrast against their rendered surface",
+    "screen_readers": "All map pins and filter chips have aria-label and descriptive status in Spanish",
+    "data_testids": "Strict data-testid attributes on all search inputs, filter toggles, job cards, map pins, wizard buttons, and AI generator buttons"
+  },
+  "media": {
+    "image_urls": [
+      {
+        "category": "vocational_students_tech",
+        "url": "https://images.pexels.com/photos/9242810/pexels-photo-9242810.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Estudiantes de Grado Superior de Electrónica y Telecomunicaciones en laboratorio de circuitos",
+        "usage_location": "Modal de bienvenida / Wizard paso 1 / Banner explicativo de Familias Profesionales"
+      },
+      {
+        "category": "vocational_health_lab",
+        "url": "https://images.pexels.com/photos/8851456/pexels-photo-8851456.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Técnicos de Laboratorio Clínico y Biomédico en entorno hospitalario moderno",
+        "usage_location": "Detalle de oferta sanitaria / Testimonios de FP Sanidad"
+      },
+      {
+        "category": "vocational_industry_technician",
+        "url": "https://images.pexels.com/photos/9242165/pexels-photo-9242165.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Técnico de Fabricación Mecánica y Mantenimiento Industrial con equipo de seguridad",
+        "usage_location": "Detalle de empresas industriales / Sector Fabricación"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Instala 'leaflet', '@types/leaflet' y 'canvas-confetti' si son necesarios para el mapa y las celebraciones de candidatura.",
+    "El mapa debe inicializarse con Leaflet (OpenStreetMap tile provider 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png' o standard OSM). Incluir fix para los iconos por defecto de Leaflet en React/Vite (L.Icon.Default.mergeOptions con URLs de CDN o SVG).",
+    "Asegurar sincronización bidireccional perfecta: hacer click en una tarjeta de empresa/oferta en la lista izquierda debe centrar el mapa (map.flyTo([lat, lng], 14)) y abrir su popup. Hacer click en un marcador del mapa debe seleccionar la tarjeta en la lista y hacer scroll hasta ella.",
+    "Todo el contenido y textos deben estar 100% en español ('Empleo Cerca de Ti', 'Ciclos Formativos', 'Grado Superior', 'Grado Medio', 'Prácticas FCT / Dual', 'Distancia', 'Afinidad con tu perfil', 'Generador IA de candidatura').",
+    "Incluir catálogo rico de datos realistas de España (Madrid, Barcelona, Valencia, Sevilla, Bilbao, Zaragoza, Málaga, Vigo, etc.) con ofertas activas reales de FP y empresas con perfil receptor de FP en los 26 sectores de Formación Profesional de España (Informática, Sanidad, Electricidad, Administración, Fabricación Mecánica, Automoción, etc.).",
+    "El asistente inicial 'Asistente de Perfil FP' (Wizard) debe ser accesible en el primer uso y editable en cualquier momento mediante un botón 'Mi Perfil FP' en el header con badge de completitud.",
+    "El Generador IA de Mensajes debe ofrecer plantillas inteligentes que se autocompletan con el perfil del alumno y los datos de la empresa seleccionada, con botones de 'Copiar mensaje', 'Abrir en Gmail / Outlook / Mailto' y 'Descargar PDF de candidatura'.",
+    "Incluir visor o simulador de subida de CV en PDF con almacenamiento en localStorage/IndexedDB del navegador para persistencia sin necesidad de login.",
+    "Incluir selector de radio de búsqueda con control deslizante interactivo (5 km a 200 km o Toda Europa) y círculo de visualización sobre el mapa Leaflet.",
+    "Añadir data-testid en todos los elementos interactivos críticos (inputs, botones, tarjetas, marcadores, filtros)."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Evitar colores planos aburridos; usar contrastes nítidos, bordes limpios de 1px (border-slate-200), sombras de profundidad calibradas y tipografía Outfit + DM Sans.",
+    "No usar gradientes oscuros en fondos de contenido. Mantener interfaz clara, profesional e institucional de nivel universitario / FP Superior.",
+    "Garantizar que no haya desbordamiento de texto en contenedores con bordes mediante un padding generoso (p-4 a p-6).",
+    "Implementar feedback con Toaster (sonner) para todas las acciones: 'Perfil guardado', 'Mensaje copiado al portapapeles', 'Filtro aplicado', 'CV cargado con éxito'."
+  ]
+}
